@@ -1,67 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Windows.Forms;
+
+// ReSharper disable InconsistentNaming
 
 namespace lab_9
 {
-    class PCCollection
+    internal class PCCollection
     {
-        List<Complectation> PC;
-        public PCCollection()
-        {
-            PC = new List<Complectation>();
-        }
-        public void Add(string name, int number, string model, string country, double price)
+        #region Fields
+
+        private List<Complectation> _pcList;
+
+        #endregion
+
+        #region Constructors
+
+        public PCCollection() => _pcList = new List<Complectation>();
+
+        #endregion
+
+        #region Public Methods
+
+        public void Add( string name, int number, string model, string country, double price )
         {
             try
             {
-                PC.Add(new Complectation(name, number, model, country, price));
+                _pcList.Add( new Complectation( name, number, model, country, price ) );
             }
-            catch(InvalidCastException e)
+            catch
             {
-                
+                //
             }
         }
-        public void Add(Complectation ob)
+
+        public void Add( Complectation ob )
         {
-            if(!PC.Contains(ob))
-                PC.Add(ob);
+            if ( !_pcList.Contains( ob ) ) _pcList.Add( ob );
         }
-        public Complectation Get(int index)
+
+        public Complectation Get( int index ) => _pcList[index];
+
+        public void Remove( int index )
         {
-            return PC[index];
+            _pcList.RemoveAt( index );
         }
-        public void Remove(int index)
-        {
-            PC.RemoveAt(index);
-        }
+
         public void Sort()
         {
-            PC.Sort();
+            _pcList.Sort();
         }
-        public int Count()
+
+        public int Count() => _pcList.Count;
+
+        public void SaveFile( string file )
         {
-            return PC.Count;
-        }
-        public void SaveFile(string file)
-        {
-            BinaryFormatter binForm = new BinaryFormatter();
-            using(Stream fstream = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.Write))
+            var binForm = new BinaryFormatter();
+            using ( var fileStream = new FileStream( file, FileMode.Create, FileAccess.Write, FileShare.Write ) )
             {
-                binForm.Serialize(fstream, PC);
+                binForm.Serialize( fileStream, _pcList );
             }
         }
-        public void OpenFile(string file)
+
+        public void OpenFile( string file )
         {
-            BinaryFormatter binFormat = new BinaryFormatter();
-            using(Stream fstream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read))
+            var binFormat = new BinaryFormatter();
+            using ( var stream = new FileStream( file, FileMode.Open, FileAccess.Read, FileShare.Read ) )
             {
-                PC = (List<Complectation>)binFormat.Deserialize(fstream);
+                _pcList = (List<Complectation>) binFormat.Deserialize( stream );
             }
         }
+
+        #endregion
     }
 }
